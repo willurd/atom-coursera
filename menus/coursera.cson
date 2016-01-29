@@ -7,7 +7,7 @@
       'submenu': [
         {
           'label': 'Add Require Statement',
-          'command': 'coursera-requires:add-require-statement'
+          'command': 'coursera:add-require-statement'
         }
       ]
     ]

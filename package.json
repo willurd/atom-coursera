@@ -1,14 +1,14 @@
 {
-  "name": "coursera-requires",
-  "main": "./lib/coursera-requires",
+  "name": "coursera",
+  "main": "./lib/coursera",
   "version": "0.0.1",
-  "description": "A short description of your package",
+  "description": "An atom package for Coursera developers",
   "keywords": [
   ],
   "activationCommands": {
-    "atom-workspace": "coursera-requires:add-require-statement"
+    "atom-workspace": "coursera:add-require-statement"
   },
-  "repository": "https://github.com/atom/coursera-requires",
+  "repository": "https://github.com/willurd/atom-coursera",
   "license": "MIT",
   "engines": {
     "atom": ">=1.0.0 <2.0.0"

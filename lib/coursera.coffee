@@ -18,15 +18,14 @@ getModuleName = (requirePath) ->
   pathParts = requirePath.split('/')
   return pathParts[pathParts.length - 1]
 
-module.exports = CourseraRequires =
+module.exports = Coursera =
   subscriptions: null
-  courseraRequiresView: null
 
   activate: (state) ->
     @active = true
 
     @subscriptions = new CompositeDisposable
-    @subscriptions.add atom.commands.add 'atom-workspace', 'coursera-requires:add-require-statement': =>
+    @subscriptions.add atom.commands.add 'atom-workspace', 'coursera:add-require-statement': =>
       @addRequireStatement()
 
     process.nextTick => @startLoadPathsTask()
@@ -44,7 +43,7 @@ module.exports = CourseraRequires =
   serialize: ->
 
   consumeAutoreload: (reloader) ->
-    reloader(pkg:"coursera-requires", files:["package.json"], folders:["lib/"])
+    reloader(pkg:"coursera", files:["package.json"], folders:["lib/"])
 
   addRequireStatement: ->
     return unless atom.workspace.getActiveTextEditor()?
