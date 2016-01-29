@@ -1,0 +1,35 @@
+{
+  "name": "coursera-requires",
+  "main": "./lib/coursera-requires",
+  "version": "0.0.1",
+  "description": "A short description of your package",
+  "keywords": [
+  ],
+  "activationCommands": {
+    "atom-workspace": "coursera-requires:add-require-statement"
+  },
+  "repository": "https://github.com/atom/coursera-requires",
+  "license": "MIT",
+  "engines": {
+    "atom": ">=1.0.0 <2.0.0"
+  },
+  "dependencies": {
+    "async": "0.2.6",
+    "atom-space-pen-views": "^2.0.0",
+    "fs-plus": "^2.0.0",
+    "fuzzaldrin": "^2.0",
+    "fuzzaldrin-plus": "^0.1",
+    "humanize-plus": "~1.4.2",
+    "minimatch": "~0.3.0",
+    "temp": "~0.8.1",
+    "underscore-plus": "^1.0.0",
+    "wrench": "^1.5"
+  },
+  "consumedServices": {
+    "autoreload": {
+      "versions": {
+        "^0.0.1": "consumeAutoreload"
+      }
+    }
+  }
+}
