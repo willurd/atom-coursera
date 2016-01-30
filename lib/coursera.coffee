@@ -74,9 +74,6 @@ module.exports = Coursera =
 
   serialize: ->
 
-  consumeAutoreload: (reloader) ->
-    reloader(pkg:"coursera", files:["package.json"], folders:["lib/"])
-
   addRequireStatement: ->
     return unless atom.workspace.getActiveTextEditor()?
     @createProjectView().toggle()

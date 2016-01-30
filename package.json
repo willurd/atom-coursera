@@ -24,12 +24,5 @@
     "temp": "~0.8.1",
     "underscore-plus": "^1.0.0",
     "wrench": "^1.5"
-  },
-  "consumedServices": {
-    "autoreload": {
-      "versions": {
-        "^0.0.1": "consumeAutoreload"
-      }
-    }
   }
 }
