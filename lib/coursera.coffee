@@ -1,22 +1,54 @@
 {CompositeDisposable} = require 'atom'
 
-getRelativeFilePath = (filePath) ->
-  paths = atom.project.getPaths()
+EXT_CONFIGS =
+  styl: { prefix: 'css', keepExt: false }
+  json: { prefix: 'json', keepExt: true }
 
-  for path in paths
-    if filePath.indexOf(path) == 0
-      return filePath.slice(path.length + 1) # Remove the leading path separator
+getRelativeFilePath = (editor, filePath) ->
+  currentPath = editor.getPath()
+  currentDirectory = getDirectory(currentPath)
+
+  if filePath.indexOf(currentDirectory) == 0
+    return filePath.replace(currentDirectory, './')
+  else
+    paths = atom.project.getPaths()
+
+    for path in paths
+      if filePath.indexOf(path) == 0
+        return filePath.slice(path.length + 1) # Remove the leading path separator
 
   return filePath
 
-getRequirePath = (filePath) ->
-  relativePath = getRelativeFilePath filePath
-  index = relativePath.lastIndexOf('.')
-  return relativePath.slice(0, index)
+getDirectory = (filePath) ->
+  pathParts = filePath.split('/')
+  return pathParts.slice(0, pathParts.length - 1).join('/') + '/'
+
+removeExtension = (filePath) ->
+  index = filePath.lastIndexOf('.')
+  return filePath.slice(0, index) if index != -1
+  return filePath
+
+getRequirePath = (editor, filePath) ->
+  ext = getExtension(filePath)
+  extConfig = EXT_CONFIGS[ext]
+  relativePath = getRelativeFilePath(editor, filePath)
+
+  if extConfig?.keepExt
+    return relativePath
+
+  return removeExtension(relativePath)
+
+getExtension = (filePath) ->
+  pathParts = filePath.split('.')
+  return pathParts[pathParts.length - 1]
+
+getPrefix = (filePath) ->
+  ext = getExtension(filePath)
+  return EXT_CONFIGS[ext]?.prefix
 
 getModuleName = (requirePath) ->
   pathParts = requirePath.split('/')
-  return pathParts[pathParts.length - 1]
+  return removeExtension(pathParts[pathParts.length - 1])
 
 module.exports = Coursera =
   subscriptions: null
@@ -51,9 +83,11 @@ module.exports = Coursera =
 
   fileChosen: (filePath) ->
     return unless editor = atom.workspace.getActiveTextEditor()
-    requirePath = getRequirePath filePath
+    prefix = getPrefix filePath
+    requirePath = getRequirePath editor, filePath
     moduleName = getModuleName requirePath
-    requireText = "const #{moduleName} = require('#{requirePath}');"
+    plugin = if prefix then (prefix + '!') else ''
+    requireText = "const #{moduleName} = require('#{plugin}#{requirePath}');"
     editor.insertText requireText
 
   createProjectView: ->
