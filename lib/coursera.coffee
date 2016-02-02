@@ -47,8 +47,24 @@ getPrefix = (filePath) ->
   return EXT_CONFIGS[ext]?.prefix
 
 getModuleName = (requirePath) ->
-  pathParts = requirePath.split('/')
-  return removeExtension(pathParts[pathParts.length - 1])
+  if isNlsFile(requirePath)
+    return '_t'
+  else
+    pathParts = requirePath.split('/')
+    return removeExtension(pathParts[pathParts.length - 1])
+
+getPlugin = (filePath, requirePath) ->
+  prefix = getPrefix filePath
+
+  console.log requirePath, requirePath.split('/')
+
+  if prefix
+    return prefix
+  else if isNlsFile(requirePath)
+    return 'i18n'
+
+isNlsFile = (requirePath) ->
+  return requirePath.split('/')[0] == 'nls'
 
 module.exports = Coursera =
   subscriptions: null
@@ -80,11 +96,10 @@ module.exports = Coursera =
 
   fileChosen: (filePath) ->
     return unless editor = atom.workspace.getActiveTextEditor()
-    prefix = getPrefix filePath
     requirePath = getRequirePath editor, filePath
     moduleName = getModuleName requirePath
-    plugin = if prefix then (prefix + '!') else ''
-    requireText = "const #{moduleName} = require('#{plugin}#{requirePath}');"
+    plugin = getPlugin filePath, requirePath
+    requireText = "const #{moduleName} = require('#{if plugin then (plugin + '!') else ''}#{requirePath}');"
     editor.insertText requireText
 
   createProjectView: ->
