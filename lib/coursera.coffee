@@ -1,23 +1,33 @@
 {CompositeDisposable} = require 'atom'
 
+FILE_RELATIVE_PATHS_ENABLED = false
 EXT_CONFIGS =
   styl: { prefix: 'css', keepExt: false }
   json: { prefix: 'json', keepExt: true }
 
-getRelativeFilePath = (editor, filePath) ->
+getProjectRelativeFilePath = (editor, filePath) ->
+  paths = atom.project.getPaths()
+
+  for path in paths
+    if filePath.indexOf(path) == 0
+      return filePath.slice(path.length + 1) # Remove the leading path separator
+
+  return filePath
+
+getFileRelativeFilePath = (editor, filePath) ->
   currentPath = editor.getPath()
   currentDirectory = getDirectory(currentPath)
 
   if filePath.indexOf(currentDirectory) == 0
     return filePath.replace(currentDirectory, './')
   else
-    paths = atom.project.getPaths()
+    return getProjectRelativeFilePath(editor, filePath)
 
-    for path in paths
-      if filePath.indexOf(path) == 0
-        return filePath.slice(path.length + 1) # Remove the leading path separator
-
-  return filePath
+getFilePath = (editor, filePath) ->
+  if FILE_RELATIVE_PATHS_ENABLED
+    return getFileRelativeFilePath(editor, filePath)
+  else
+    return getProjectRelativeFilePath(editor, filePath)
 
 getDirectory = (filePath) ->
   pathParts = filePath.split('/')
@@ -31,7 +41,7 @@ removeExtension = (filePath) ->
 getRequirePath = (editor, filePath) ->
   ext = getExtension(filePath)
   extConfig = EXT_CONFIGS[ext]
-  relativePath = getRelativeFilePath(editor, filePath)
+  relativePath = getFilePath(editor, filePath)
 
   if extConfig?.keepExt
     return relativePath
@@ -99,7 +109,9 @@ module.exports = Coursera =
     requirePath = getRequirePath editor, filePath
     moduleName = getModuleName requirePath
     plugin = getPlugin filePath, requirePath
-    requireText = "const #{moduleName} = require('#{if plugin then (plugin + '!') else ''}#{requirePath}');"
+    prefix = if plugin != 'css' then "const #{moduleName} = " else ''
+    pluginText = if plugin then (plugin + '!') else ''
+    requireText = "#{prefix}require('#{pluginText}#{requirePath}');"
     editor.insertText requireText
 
   createProjectView: ->
